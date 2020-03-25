@@ -24,6 +24,18 @@ class GameViewController: UIViewController {
         skView.ignoresSiblingOrder = true
         scene.scaleMode = .aspectFill
         
+        let posY = scene.size.height*0.275
+        let widthBody = scene.size.width
+        let heightBody = scene.size.height*0.75
+
+        let sceneRect = CGRect(x: 0, y: posY, width: widthBody, height: heightBody)
+        
+        /// Seta o physics Body da cena - O edge loop determina um corpo estático, não move e nem colide
+        scene.physicsBody = SKPhysicsBody(edgeLoopFrom: sceneRect)
+
+        /// Zerar a gravidade
+        //scene.physicsWorld.gravity = CGVector(dx: 0, dy: 0)
+        
         skView.presentScene(scene)
        
     }

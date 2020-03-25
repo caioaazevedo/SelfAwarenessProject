@@ -41,9 +41,6 @@ class GameScene: SKScene {
         /// Rotação e m relação a pi
         //background.zRotation = CGFloat.pi / 8
         
-        /// Adição do Player
-        addChild(player)
-        
         player.anchorPoint = CGPoint(x: 0.5, y: 0)
         
         player.position = CGPoint(x: self.size.width * 0.2, y: self.size.height * 0.35)
@@ -57,9 +54,11 @@ class GameScene: SKScene {
         
         player.size = CGSize(width: playerWidth, height: playerHeight)
         
-        /// Adição do Obstáculo
+        /// Cria o corpo que receberá a aplicação da física - esse é o jeito mais performático
+        player.physicsBody = SKPhysicsBody(circleOfRadius: playerWidth/2)
         
-        addChild(wall)
+        // Adição do Player
+        addChild(player)
         
         /// Tamanho da Tela: Largura = 1366 Altura = 1024
         /// Tamanho do Player Lrgura = 138,39 Altura = 512,09
@@ -72,6 +71,9 @@ class GameScene: SKScene {
         wall.position = CGPoint(x: self.size.width * 0.55, y: self.size.height * 0.35)
         
         wall.size = CGSize(width: wallWidth, height: wallHeight)
+        
+        /// Adição do Obstáculo
+        addChild(wall)
         
         ///Adição do botão de movimento para  trás
         btnBackwards.fillColor = .blue
