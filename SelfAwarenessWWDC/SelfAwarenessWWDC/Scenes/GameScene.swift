@@ -202,9 +202,29 @@ class GameScene: SKScene {
 extension GameScene: SKPhysicsContactDelegate{
     func didBegin(_ contact: SKPhysicsContact) {
         if contact.bodyB.node?.name == "player" && contact.bodyA.node?.name == "scene" {
-            print(contact.contactPoint)
-            textLabel.removeFromParent()
-            textLabelLine2.removeFromParent()
+            if contact.contactPoint.x > 1360 {
+                let actionFadeOut = SKAction.fadeOut(withDuration: 1)
+
+                
+                textLabel.run(actionFadeOut)
+                textLabelLine2.run(actionFadeOut){
+                    self.textLabel.removeFromParent()
+                    self.textLabelLine2.removeFromParent()
+                    
+                    let actionFadeIn = SKAction.fadeIn(withDuration: 1)
+                    
+                    self.textLabel.text = self.text2
+                    self.textLabel.fontSize = 35
+                    self.textLabel.fontColor = SKColor.brown
+                    self.textLabel.position = CGPoint(x: self.frame.size.width*0.25, y: self.size.height*0.9)
+                    
+                    self.addChild(self.textLabel)
+                    self.textLabel.run(actionFadeIn)
+                }
+                
+                
+            }
+            
         }
     }
 }
