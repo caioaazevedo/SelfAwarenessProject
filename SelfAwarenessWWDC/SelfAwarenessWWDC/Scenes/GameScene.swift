@@ -10,15 +10,24 @@ import SpriteKit
 
 class GameScene: SKScene {
     
+    /// Atributos Nodes
     let background = SKSpriteNode(imageNamed: "PlanoFundo_Mono")
     let player = SKSpriteNode(imageNamed: "BallPlayer")
-    let wall = SKSpriteNode(imageNamed: "Wall")
+    let wall = SKSpriteNode(imageNamed: "BigWall")
     var ground = SKShapeNode()
     let btnBackwards = SKShapeNode(circleOfRadius: 50)
     let btnFowards = SKShapeNode(circleOfRadius: 50)
     let btnJump = SKShapeNode(circleOfRadius: 50)
     let backgroundMusic = SKAudioNode(fileNamed: "Acústico.m4a")
+    let textLabel = SKLabelNode(fontNamed: "Geneva")
+    let textLabelLine2 = SKLabelNode(fontNamed: "Geneva")
     
+    /// Constantes de texto
+    let text1 = "Sometimes in life you have obstacles"
+    let text1_2 = "that you need to go through"
+    let text2 = "Some are more difficult than others"
+    
+    /// Flags
     var updateePosition = false
     var fowardsBtn = false
     var backwardsBtn = false
@@ -26,6 +35,8 @@ class GameScene: SKScene {
     override func didMove(to view: SKView) {
         
         addChild(background)
+        
+        physicsWorld.contactDelegate = self
         
 //        addChild(backgroundMusic)
         
@@ -58,6 +69,8 @@ class GameScene: SKScene {
         
         /// Cria o corpo que receberá a aplicação da física - esse é o jeito mais performático
         player.physicsBody = SKPhysicsBody(circleOfRadius: playerWidth/2)
+        player.name = "player"
+        player.physicsBody!.contactTestBitMask = player.physicsBody!.collisionBitMask
         
         // Adição do Player
         addChild(player)
@@ -110,13 +123,28 @@ class GameScene: SKScene {
         
         btnFowards.name = "fowards"
         
-       ///Adição do botão de movimento para  frente
-       btnJump.fillColor = .green
-       btnJump.position = CGPoint(x: self.size.width*0.3, y: self.size.height*0.1)
-       
-       addChild(btnJump)
-       
-       btnJump.name = "jump"
+        ///Adição do botão de movimento para  frente
+        btnJump.fillColor = .green
+        btnJump.position = CGPoint(x: self.size.width*0.3, y: self.size.height*0.1)
+
+        addChild(btnJump)
+
+        btnJump.name = "jump"
+        
+        ///Configuração e adição do texto na Tela
+        textLabel.text = text1
+        textLabel.fontSize = 35
+        textLabel.fontColor = SKColor.brown
+        textLabel.position = CGPoint(x: self.frame.size.width*0.25, y: self.size.height*0.9)
+        
+        textLabelLine2.text = text1_2
+        textLabelLine2.fontSize = 35
+        textLabelLine2.fontColor = SKColor.brown
+        textLabelLine2.position = CGPoint(x: self.frame.size.width*0.25, y: self.size.height*0.85)
+
+        addChild(textLabel)
+        addChild(textLabelLine2)
+
         
         
     }
@@ -169,4 +197,14 @@ class GameScene: SKScene {
     
     
     
+}
+
+extension GameScene: SKPhysicsContactDelegate{
+    func didBegin(_ contact: SKPhysicsContact) {
+        if contact.bodyB.node?.name == "player" && contact.bodyA.node?.name == "scene" {
+            print(contact.contactPoint)
+            textLabel.removeFromParent()
+            textLabelLine2.removeFromParent()
+        }
+    }
 }
