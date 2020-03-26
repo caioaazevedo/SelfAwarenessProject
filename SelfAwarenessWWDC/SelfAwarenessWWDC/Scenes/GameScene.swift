@@ -10,11 +10,13 @@ import SpriteKit
 
 class GameScene: SKScene {
     
-    let background = SKSpriteNode(imageNamed: "Background_Mono")
+    let background = SKSpriteNode(imageNamed: "PlanoFundo_Mono")
     let player = SKSpriteNode(imageNamed: "BallPlayer")
     let wall = SKSpriteNode(imageNamed: "Wall")
-    let btnBackwards = SKShapeNode(circleOfRadius: 70)
-    let btnFowards = SKShapeNode(circleOfRadius: 70)
+    var ground = SKShapeNode()
+    let btnBackwards = SKShapeNode(circleOfRadius: 50)
+    let btnFowards = SKShapeNode(circleOfRadius: 50)
+    let btnJump = SKShapeNode(circleOfRadius: 50)
     let backgroundMusic = SKAudioNode(fileNamed: "Acústico.m4a")
     
     var updateePosition = false
@@ -41,16 +43,16 @@ class GameScene: SKScene {
         /// Rotação e m relação a pi
         //background.zRotation = CGFloat.pi / 8
         
-        player.anchorPoint = CGPoint(x: 0.5, y: 0)
+        player.anchorPoint = CGPoint(x: 0.5, y: 0.5)
         
-        player.position = CGPoint(x: self.size.width * 0.2, y: self.size.height * 0.35)
+        player.position = CGPoint(x: self.size.width * 0.35, y: self.size.height * 0.5)
         
         /// Tamanho da Tela: Largura = 1366 Altura = 1024
-        /// Tamanho do Player Lrgura = 146 Altura = 130
+        /// Tamanho do Player Lrgura = 117 Altura = 123
         /// Calculo Referente a Tela: Largura = 0.10689 Altura = 0.12695
         
-        let playerWidth = self.size.width * 0.10689
-        let playerHeight = self.size.height * 0.12695
+        let playerWidth = self.size.width * 0.095651
+        let playerHeight = self.size.height * 0.13011
         
         player.size = CGSize(width: playerWidth, height: playerHeight)
         
@@ -65,15 +67,31 @@ class GameScene: SKScene {
         /// Calculo Referente a Tela: Largura = 0.10131 Altura = 0.50008
         
         let wallWidth = self.size.width * 0.10131
-        let wallHeight = self.size.height * 0.50008
+        let wallHeight = self.size.height * 0.47508
         
-        wall.anchorPoint = CGPoint(x: 0.5, y: 0)
-        wall.position = CGPoint(x: self.size.width * 0.55, y: self.size.height * 0.35)
+        wall.anchorPoint = CGPoint(x: 0.5, y: 0.5)
+        wall.position = CGPoint(x: self.size.width * 0.55, y: self.size.height*0.6)
         
         wall.size = CGSize(width: wallWidth, height: wallHeight)
         
+        wall.physicsBody = SKPhysicsBody(rectangleOf: wall.frame.size)
+        wall.physicsBody?.isDynamic = false
+        
         /// Adição do Obstáculo
         addChild(wall)
+        
+        ///Adicionando o chão
+        ground = SKShapeNode(rect: CGRect(x: 0, y: self.size.height*0.35, width: self.frame.width, height: 5))
+        
+//        ground.lineWidth = 5
+        ground.physicsBody = SKPhysicsBody(edgeLoopFrom: ground.frame)
+        ground.physicsBody?.restitution = 0.5
+        ground.physicsBody?.isDynamic = false
+        ground.alpha = 1.0
+        
+        addChild(ground)
+        
+        self.physicsWorld.gravity = CGVector(dx: 0, dy: -10)
         
         ///Adição do botão de movimento para  trás
         btnBackwards.fillColor = .blue
@@ -91,6 +109,16 @@ class GameScene: SKScene {
         addChild(btnFowards)
         
         btnFowards.name = "fowards"
+        
+       ///Adição do botão de movimento para  frente
+       btnJump.fillColor = .green
+       btnJump.position = CGPoint(x: self.size.width*0.3, y: self.size.height*0.1)
+       
+       addChild(btnJump)
+       
+       btnJump.name = "jump"
+        
+        
     }
     
     /// Método responsável por identificar o início do toque do ususário
@@ -105,7 +133,10 @@ class GameScene: SKScene {
                 backwardsBtn = true
             } else if node.name == "fowards"{
                 fowardsBtn = true
+            } else if node.name == "jump" {
+                player.physicsBody?.applyImpulse(CGVector(dx: 0, dy: 500), at: player.position)
             }
+            
         }
         self.updateePosition = true
     }
@@ -130,9 +161,9 @@ class GameScene: SKScene {
     ///Método responsável por atualização de tela - Executa 60 vezes por segundo (60 FPS)
     override func update(_ currentTime: TimeInterval) {
         if updateePosition && fowardsBtn && player.position.x < self.size.width*0.93 {
-            player.position.x = player.position.x+7
+            player.physicsBody?.applyImpulse(CGVector(dx: +10, dy: 0), at: player.position)
         } else if updateePosition && backwardsBtn && player.position.x > self.size.width*0.07{
-            player.position.x = player.position.x-7
+            player.physicsBody?.applyImpulse(CGVector(dx: -10, dy: 0), at: player.position)
         }
     }
     

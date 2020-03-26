@@ -20,13 +20,14 @@ class GameViewController: UIViewController {
         let skView = self.view as! SKView
         
         skView.showsFPS = true
+//        skView.showsPhysics = true
         skView.showsNodeCount = true
         skView.ignoresSiblingOrder = true
         scene.scaleMode = .aspectFill
         
         let posY = scene.size.height*0.275
         let widthBody = scene.size.width
-        let heightBody = scene.size.height*0.75
+        let heightBody = scene.size.height*0.85
 
         let sceneRect = CGRect(x: 0, y: posY, width: widthBody, height: heightBody)
         
