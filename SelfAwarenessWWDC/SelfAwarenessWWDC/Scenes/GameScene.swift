@@ -30,6 +30,7 @@ class GameScene: SKScene {
     let btnJump = SKShapeNode(circleOfRadius: 50)
     
     let backgroundMusic = SKAudioNode(fileNamed: "Acústico.m4a")
+    let damageSound = SKAudioNode(fileNamed: "Damage.wav")
     
     let textLabel = SKLabelNode(fontNamed: "Helvetica")
     let textLabelLine2 = SKLabelNode(fontNamed: "Helvetica")
@@ -44,6 +45,7 @@ class GameScene: SKScene {
     var cloneCreated = false
     var gotPowerVision = false
     var mirrorCrached = false
+    var beginFrases = false
     
     /// Constantes de texto
     let text1 = "Sometimes in life you have obstacles"
@@ -61,6 +63,31 @@ class GameScene: SKScene {
     
     let text6 = "This is what really happens"
     
+    let text7 = "The most difficult obstacles to pass"
+    let text7_2 = "is yourself"
+    
+    let text8 = "You in the same time that not allowing"
+    let text8_2 = "yourself to pass get hurt by it"
+    
+    let text9 = "You are the victim and the aggressor"
+    
+    let text10 = "Now that you know that you are "
+    let text10_2 = "your own enemy"
+    
+    let text11 = "What if you were able to change that?"
+    
+    let text12 = "How to fight an enemy that is yourself?"
+    
+    let text13 = "SELF AWARENESS"
+    let text13_2 = "Allows you to understand who you really are"
+    
+    let text14 = "And by that you shield yourself"
+    let text14_2 = "Now that enemy doesn't affect you anymore"
+    
+    var arrayText = [""]
+    var arrayTextLine2 = [""]
+    
+    
     
     /// Flags
     var updateePosition = false
@@ -68,6 +95,10 @@ class GameScene: SKScene {
     var backwardsBtn = false
 
     override func didMove(to view: SKView) {
+        
+        arrayText = [self.text6, self.text7, self.text8, self.text9, self.text10, self.text11, self.text12]
+        arrayTextLine2 = [self.text7_2, self.text8_2, self.text10_2]
+        
 
         addChild(background)
         
@@ -189,11 +220,9 @@ class GameScene: SKScene {
 //MARK: - Parede invisível
         let posX = self.size.width
         invisibleWall = SKShapeNode(rect: CGRect(x: posX, y: 0, width: 0, height: self.size.height))
-        invisibleWall.physicsBody = SKPhysicsBody(edgeLoopFrom: invisibleWall.frame)
         invisibleWall.alpha = 1.0
         invisibleWall.name = "invisibleWall"
         invisibleWall.fillColor = .blue
-        invisibleWall.physicsBody?.collisionBitMask = 0b0001
        
         addChild(invisibleWall)
        
@@ -359,91 +388,35 @@ class GameScene: SKScene {
             clonePlayer.position = CGPoint(x: smallWall.position.x + (smallWall.position.x - player.position.x), y: player.position.y)
             clonePlayer.zRotation = -player.zRotation
         }
-    }
-    
-}
-
-//MARK: - Colisão
-extension GameScene: SKPhysicsContactDelegate{
-    func didBegin(_ contact: SKPhysicsContact) {
-        //Verifica o contato
-        if contact.bodyB.node?.name == "player" && contact.bodyA.node?.name == "invisibleWall" || contact.bodyA.node?.name == "player" && contact.bodyB.node?.name == "invisibleWall" {
-
+        
+        if player.intersects(invisibleWall) {
+            
             switch invisibleWallCount {
             case 0:
-                print(contact.contactPoint)
-                contact.bodyA.node?.removeFromParent()
-
-                changeText(msgTxt1: text2, msgTxt2: "", color: .brown)
+                invisibleWall.removeFromParent()
+                changeText(msgTxt1: text2, msgTxt2: "", color: .brown, timeWait: nil, completion: nil)
                 invisibleWallCount += 1
 
                 invisibleWall.position = CGPoint(x: 2000, y:0)
                 addChild(invisibleWall)
             case 1:
-                contact.bodyA.node?.removeFromParent()
+                invisibleWall.removeFromParent()
 
-                changeText(msgTxt1: text3, msgTxt2: "", color: .brown)
+                changeText(msgTxt1: text3, msgTxt2: "", color: .brown, timeWait: nil, completion: nil)
                 invisibleWallCount += 1
             default:
-                print("pass")
-            }
-        } else if contact.bodyB.node?.name == "player" && contact.bodyA.node?.name == "mirror" || contact.bodyA.node?.name == "player" && contact.bodyB.node?.name == "mirror"{
-            if invisibleWallCount == 2 {
-                changeText(msgTxt1: text4, msgTxt2: text4_2, color: .brown)
-                addChild(trueVisionPower)
-                invisibleWallCount = -1
-            } else if gotPowerVision {
-                changeText(msgTxt1: text6, msgTxt2: "", color: .white)
+                print("nothing")
             }
             
-        } else if contact.bodyB.node?.name == "player" && contact.bodyA.node?.name == "trueVisionPower" || contact.bodyA.node?.name == "player" && contact.bodyB.node?.name == "trueVisionPower" {
-            let fadeOut = SKAction.fadeOut(withDuration: 1)
-            let fadeIn = SKAction.fadeIn(withDuration: 1)
-            trueVisionPower.physicsBody = nil
-            
-            trueVisionPower.run(fadeOut){
-                self.trueVisionPower.removeFromParent()
-            }
-            background.run(fadeOut)
-            background3.run(fadeOut)
-            background2.run(fadeOut){
-                
-                self.background.texture = SKTexture(imageNamed: "Background_Color")
-                self.background2.texture = SKTexture(imageNamed: "Background_Color")
-                self.background3.texture = SKTexture(imageNamed: "Background_Color")
-                self.background.run(fadeIn)
-                self.background2.run(fadeIn)
-                self.background3.run(fadeIn)
-                
-                self.smallWall.texture = SKTexture(imageNamed: "SmallWall_Color")
-                self.mediumWall.texture = SKTexture(imageNamed: "MediumWall_Color")
-                self.bigWall.texture = SKTexture(imageNamed: "BigWall_Color")
-                self.smallWall.run(fadeIn)
-                self.mediumWall.run(fadeIn)
-                self.bigWall.run(fadeIn)
-            }
-            
-            changeText(msgTxt1: text5, msgTxt2: text5_2, color: .white)
-            
-            clonePlayer.run(fadeIn){
-                self.clonePlayer.alpha = 1.0
-            }
-            
-            gotPowerVision = true
         }
-            print("a: \(contact.bodyA.node?.name ?? "nada"), B: \(contact.bodyB.node?.name ?? "nada")")
-            
     }
     
-    func changeText(msgTxt1: String, msgTxt2: String, color: SKColor) {
+    func changeText(msgTxt1: String, msgTxt2: String, color: SKColor, timeWait: TimeInterval?, completion: (() -> ())?) {
         let actionFadeOut = SKAction.fadeOut(withDuration: 1)
-        textLabel.run(actionFadeOut)
-        textLabelLine2.run(actionFadeOut){
-            self.textLabel.removeFromParent()
-            self.textLabelLine2.removeFromParent()
-            
-            let actionFadeIn = SKAction.fadeIn(withDuration: 1)
-            
+        let actionFadeIn = SKAction.fadeIn(withDuration: 1)
+        
+        textLabelLine2.run(actionFadeOut)
+        textLabel.run(actionFadeOut){
             self.textLabel.text = msgTxt1
             self.textLabel.fontSize = 35
             self.textLabel.fontColor = color
@@ -452,10 +425,125 @@ extension GameScene: SKPhysicsContactDelegate{
             self.textLabelLine2.fontSize = 35
             self.textLabelLine2.fontColor = color
             
-            self.addChild(self.textLabel)
-            self.addChild(self.textLabelLine2)
-            self.textLabel.run(actionFadeIn)
-            self.textLabelLine2.run(actionFadeIn)
+            if let time = timeWait {
+                let wait = SKAction.wait(forDuration: time)
+                let sequence = SKAction.sequence([actionFadeIn, wait])
+                self.textLabelLine2.run(actionFadeIn)
+                self.textLabel.run(sequence){
+                guard let completion = completion else { return }
+                    completion()
+                }
+            } else {
+                self.textLabel.run(actionFadeIn)
+                self.textLabelLine2.run(actionFadeIn)
+                guard let completion = completion else { return }
+                completion()
+            }
         }
+    }
+    
+    func damege(node: SKSpriteNode){
+        let colorize = SKAction.colorize(with: .red, colorBlendFactor: 1.0, duration: 0.05)
+        
+        let sequence = SKAction.sequence([colorize, SKAction.wait(forDuration: 0.2),colorize.reversed()])
+        
+        node.run(sequence)
+        
+        addChild(damageSound)
+        
+        damageSound.run(SKAction.changeVolume(to: 0.3, duration: 0))
+        damageSound.run(SKAction.wait(forDuration: 0.5)){
+            self.damageSound.removeFromParent()
+        }
+        
+    }
+    
+}
+
+//MARK: - Colisão
+extension GameScene: SKPhysicsContactDelegate{
+    func didBegin(_ contact: SKPhysicsContact) {
+        //Verifica o contato
+        if contact.bodyB.node?.name == "player" && contact.bodyA.node?.name == "mirror" || contact.bodyA.node?.name == "player" && contact.bodyB.node?.name == "mirror"{
+            
+            damege(node: player)
+            
+            if invisibleWallCount == 2 {
+                changeText(msgTxt1: text4, msgTxt2: text4_2, color: .brown, timeWait: nil, completion: nil)
+                addChild(trueVisionPower)
+                invisibleWallCount = -1
+            } else if gotPowerVision  && !beginFrases{
+                
+                changeText(msgTxt1: text6, msgTxt2: "", color: .white, timeWait: 3) {
+                    self.changeText(msgTxt1: self.text7, msgTxt2: self.text7_2, color: .white, timeWait: 3) {
+                        self.changeText(msgTxt1: self.text8, msgTxt2: self.text8_2, color: .white, timeWait: 3) {
+                            self.changeText(msgTxt1: self.text9, msgTxt2: "", color: .white, timeWait: 3) {
+                                self.changeText(msgTxt1: self.text10, msgTxt2: self.text10_2, color: .white, timeWait: 3) {
+                                    self.changeText(msgTxt1: self.text11, msgTxt2: "", color: .white, timeWait: 3) {
+                                        self.changeText(msgTxt1: self.text12, msgTxt2: "", color: .white, timeWait: 3){
+                                            self.player.run(SKAction.fadeOut(withDuration: 1)){
+                                                self.player.texture = SKTexture(imageNamed: "Player_Titanium")
+                                                self.player.setScale(1.5)
+                                                self.player.run(SKAction.fadeIn(withDuration: 1))
+                                                self.changeText(msgTxt1: self.text13, msgTxt2: self.text13_2, color: .white, timeWait: 3){
+                                                    self.changeText(msgTxt1: self.text14, msgTxt2: self.text14_2, color: .white, timeWait: 3){
+                                                        
+                                                    }
+                                                }
+                                            }
+                                            self.clonePlayer.run(SKAction.fadeAlpha(by: 0.2, duration: 1))
+                                            self.mirror.removeFromParent()
+                                            
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                
+                beginFrases = true
+            }
+            
+        } else if contact.bodyB.node?.name == "player" && contact.bodyA.node?.name == "trueVisionPower" || contact.bodyA.node?.name == "player" && contact.bodyB.node?.name == "trueVisionPower" {
+            
+            if !gotPowerVision {
+                let fadeOut = SKAction.fadeOut(withDuration: 1)
+                let fadeIn = SKAction.fadeIn(withDuration: 1)
+                trueVisionPower.physicsBody = nil
+                
+                trueVisionPower.run(fadeOut){
+                    self.trueVisionPower.removeFromParent()
+                }
+                background.run(fadeOut)
+                background3.run(fadeOut)
+                background2.run(fadeOut){
+                    
+                    self.background.texture = SKTexture(imageNamed: "Background_Color")
+                    self.background2.texture = SKTexture(imageNamed: "Background_Color")
+                    self.background3.texture = SKTexture(imageNamed: "Background_Color")
+                    self.background.run(fadeIn)
+                    self.background2.run(fadeIn)
+                    self.background3.run(fadeIn)
+                    
+                    self.smallWall.texture = SKTexture(imageNamed: "SmallWall_Color")
+                    self.mediumWall.texture = SKTexture(imageNamed: "MediumWall_Color")
+                    self.bigWall.texture = SKTexture(imageNamed: "BigWall_Color")
+                    self.smallWall.run(fadeIn)
+                    self.mediumWall.run(fadeIn)
+                    self.bigWall.run(fadeIn)
+                }
+                
+                changeText(msgTxt1: text5, msgTxt2: text5_2, color: .white, timeWait: 0, completion: nil)
+                
+                clonePlayer.run(fadeIn){
+                    self.clonePlayer.alpha = 1.0
+                }
+                
+                gotPowerVision = true
+            }
+        }
+            print("a: \(contact.bodyA.node?.name ?? "nada"), B: \(contact.bodyB.node?.name ?? "nada")")
+            
     }
 }

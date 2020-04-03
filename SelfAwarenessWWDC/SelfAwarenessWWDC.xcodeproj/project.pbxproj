@@ -7,7 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		E298DBA2242B9FF3004D232C /* Acústico.m4a in Resources */ = {isa = PBXBuildFile; fileRef = E298DBA1242B9FF2004D232C /* Acústico.m4a */; };
+		E2A85F18243665860020FDB0 /* Damage.wav in Resources */ = {isa = PBXBuildFile; fileRef = E2A85F17243665860020FDB0 /* Damage.wav */; };
 		E2BDA96C242A7FFA0050C785 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = E2BDA96B242A7FFA0050C785 /* AppDelegate.swift */; };
 		E2BDA972242A7FFA0050C785 /* GameScene.swift in Sources */ = {isa = PBXBuildFile; fileRef = E2BDA971242A7FFA0050C785 /* GameScene.swift */; };
 		E2BDA974242A7FFA0050C785 /* GameViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E2BDA973242A7FFA0050C785 /* GameViewController.swift */; };
@@ -16,10 +16,11 @@
 		E2BDA97C242A7FFE0050C785 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = E2BDA97A242A7FFE0050C785 /* LaunchScreen.storyboard */; };
 		E2BDA986242A8BD00050C785 /* Player.swift in Sources */ = {isa = PBXBuildFile; fileRef = E2BDA985242A8BD00050C785 /* Player.swift */; };
 		E2BDA988242A90F20050C785 /* Wall.swift in Sources */ = {isa = PBXBuildFile; fileRef = E2BDA987242A90F20050C785 /* Wall.swift */; };
+		E2D9D75F243664D000BD974F /* Acústico.m4a in Resources */ = {isa = PBXBuildFile; fileRef = E2D9D75D243664D000BD974F /* Acústico.m4a */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		E298DBA1242B9FF2004D232C /* Acústico.m4a */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Acústico.m4a"; sourceTree = "<group>"; };
+		E2A85F17243665860020FDB0 /* Damage.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = Damage.wav; sourceTree = "<group>"; };
 		E2BDA968242A7FFA0050C785 /* SelfAwarenessWWDC.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SelfAwarenessWWDC.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		E2BDA96B242A7FFA0050C785 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		E2BDA971242A7FFA0050C785 /* GameScene.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameScene.swift; sourceTree = "<group>"; };
@@ -30,6 +31,7 @@
 		E2BDA97D242A7FFE0050C785 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		E2BDA985242A8BD00050C785 /* Player.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Player.swift; sourceTree = "<group>"; };
 		E2BDA987242A90F20050C785 /* Wall.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Wall.swift; sourceTree = "<group>"; };
+		E2D9D75D243664D000BD974F /* Acústico.m4a */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Acústico.m4a"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -62,7 +64,7 @@
 		E2BDA96A242A7FFA0050C785 /* SelfAwarenessWWDC */ = {
 			isa = PBXGroup;
 			children = (
-				E2BDA989242AC1890050C785 /* Music */,
+				E2BDA989242AC1890050C785 /* Sounds */,
 				E2BDA984242A8BAF0050C785 /* Characters */,
 				E2BDA983242A8B980050C785 /* Scenes */,
 				E2BDA96B242A7FFA0050C785 /* AppDelegate.swift */,
@@ -92,12 +94,13 @@
 			path = Characters;
 			sourceTree = "<group>";
 		};
-		E2BDA989242AC1890050C785 /* Music */ = {
+		E2BDA989242AC1890050C785 /* Sounds */ = {
 			isa = PBXGroup;
 			children = (
-				E298DBA1242B9FF2004D232C /* Acústico.m4a */,
+				E2D9D75D243664D000BD974F /* Acústico.m4a */,
+				E2A85F17243665860020FDB0 /* Damage.wav */,
 			);
-			path = Music;
+			path = Sounds;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -158,8 +161,9 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				E2D9D75F243664D000BD974F /* Acústico.m4a in Resources */,
 				E2BDA977242A7FFA0050C785 /* Main.storyboard in Resources */,
-				E298DBA2242B9FF3004D232C /* Acústico.m4a in Resources */,
+				E2A85F18243665860020FDB0 /* Damage.wav in Resources */,
 				E2BDA979242A7FFE0050C785 /* Assets.xcassets in Resources */,
 				E2BDA97C242A7FFE0050C785 /* LaunchScreen.storyboard in Resources */,
 			);
