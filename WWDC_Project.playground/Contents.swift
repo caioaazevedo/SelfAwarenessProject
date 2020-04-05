@@ -1,9 +1,7 @@
 import PlaygroundSupport
 import SpriteKit
 
-// Load the SKScene from 'GameScene.sks'
-let frame = CGRect(x:0 , y:0, width: 683, height: 512)
-let skView = SKView(frame: frame)
+let skView = SKView(frame: CGRect(x:0 , y:0, width: 683, height: 512))
 let scene = GameScene(size: CGSize(width: 683, height: 512))
 
     skView.showsFPS = true

@@ -21,14 +21,16 @@ public class GameScene: SKScene {
     var backgroundMusic = SKAudioNode()
     var damageSound = SKAudioNode()
     var breakingMirrorSound = SKAudioNode()
+    var powerRise = SKAudioNode()
+    var backgroundFade = SKAudioNode()
 
     var gameText = GameText()
 
     var gameCamera = SKCameraNode()
 
-    var invisibleWall = InvisibleWall()
-    var mirror = Mirror()
-    var trueVisionPower = Power()
+    var invisibleWall = SKShapeNode()
+    var mirror = SKShapeNode()
+    var trueVisionPower = SKShapeNode()
     
     var invisibleWallCount = 0
     
@@ -43,6 +45,13 @@ public class GameScene: SKScene {
     
     public override init(size: CGSize) {
         super.init(size: size)
+    }
+    
+    required init?(coder aDecoder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
+    public override func didMove(to view: SKView) {
         /// Adição da música na Cena em loop infinito
         backgroundMusic = SKAudioNode(fileNamed: "Sounds/Acústico.m4a")
         backgroundMusic.run(SKAction.changeVolume(to: 0.1, duration: 0))
@@ -50,6 +59,8 @@ public class GameScene: SKScene {
 
         addChild(backgroundMusic)
 
+        powerRise = SKAudioNode(fileNamed: "Sounds/PowerRise.m4a")
+        backgroundFade = SKAudioNode(fileNamed: "Sounds/BackgroudRise.m4a")
         damageSound = SKAudioNode(fileNamed: "Sounds/Damage.wav")
         breakingMirrorSound = SKAudioNode(fileNamed: "Sounds/GlassBroken.mp3")
 
@@ -78,22 +89,35 @@ public class GameScene: SKScene {
         addChild(smallWall)
 
         /// Adição das Paredes Invisíveis para mudaça de texto da Label
-        invisibleWall = InvisibleWall(scene: self)
-        addChild(invisibleWall.invisibleWall)
+        let posX = self.size.width
+        invisibleWall = SKShapeNode(rect: CGRect(x: posX, y: 0, width: 0, height: self.size.height))
+        invisibleWall.alpha = 0.0
+        invisibleWall.name = "invisibleWall"
+        invisibleWall.fillColor = .blue
+        
+        addChild(invisibleWall)
 
         /// Adição do espelho invisível
-        mirror = Mirror(scene: self, smallWall: smallWall)
-        addChild(mirror.mirror)
+        let positionX = smallWall.position.x
+        mirror = SKShapeNode(rect: CGRect(x: positionX, y: 0, width: 0, height: self.size.height))
+        mirror.physicsBody = SKPhysicsBody(edgeLoopFrom: mirror.frame)
+        mirror.physicsBody?.isDynamic = false
+        mirror.physicsBody?.restitution = 0.8
+        mirror.alpha = 1.0
+        mirror.name = "mirror"
+        mirror.fillColor = .blue
+        mirror.physicsBody?.collisionBitMask = 0b0001
+        addChild(mirror)
 
         /// Adição do Player na cena
-        player = Player(scene: self)
+        player = Ball(scene: self)
         player.physicsBody!.contactTestBitMask = 0b0001
         player.name = "player"
         addChild(player)
 
         /// Adição do Clone na cena
         clonePlayer = Ball(scene: self)
-        let point = CGPoint(x: smallWall.position.x + self.size.width*0.2, y: self.position.y*0.5)
+        let point = CGPoint(x: smallWall.position.x + self.size.width*0.2, y: player.position.y)
         clonePlayer.position = point
         clonePlayer.alpha = 0
         addChild(clonePlayer)
@@ -101,15 +125,22 @@ public class GameScene: SKScene {
         controls = Control(scene: self)
 
         gameText = GameText(scene: self)
-
-        trueVisionPower = Power(scene: self, bigWall: bigWall)
-        addChild(trueVisionPower.trueVisionPower)
+        addChild(gameText.textLabel)
+        addChild(gameText.textLabelLine2)
+        
+        
+        self.trueVisionPower = SKShapeNode(circleOfRadius: 25)
+        self.trueVisionPower.position = CGPoint(x: bigWall.position.x + self.size.width*0.6, y: self.size.height*0.4)
+        self.trueVisionPower.fillColor = .blue
+        self.trueVisionPower.name = "trueVisionPower"
+        self.trueVisionPower.physicsBody = SKPhysicsBody(circleOfRadius: trueVisionPower.frame.size.width/2)
+        self.trueVisionPower.physicsBody?.isDynamic = false
 
         /// Configuração da física do jogo e delimitação da área sujeita a física
         self.physicsWorld.contactDelegate = self
 
-        let posY = self.size.height*0.275
-        let widthBody = self.size.width*3
+        let posY = self.size.height*0.35
+        let widthBody = self.size.width*4
         let heightBody = self.size.height*0.85
 
         let sceneRect = CGRect(x: 0, y: posY, width: widthBody, height: heightBody)
@@ -117,14 +148,6 @@ public class GameScene: SKScene {
         /// Seta o physics Body da cena - O edge loop determina um corpo estático, não move e nem colide
         self.physicsBody = SKPhysicsBody(edgeLoopFrom: sceneRect)
         self.physicsWorld.gravity = CGVector(dx: 0, dy: -5)
-    }
-    
-    required init?(coder aDecoder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
-    }
-    
-    public override func didMove(to view: SKView) {
-        
     }
     
 //MARK: - Movimento
@@ -141,7 +164,7 @@ public class GameScene: SKScene {
             } else if node.name == "fowards"{
                 fowardsBtn = true
             } else if node.name == "jump" {
-                player.physicsBody?.applyImpulse(CGVector(dx: 0, dy: 50), at: player.position)
+                player.physicsBody?.applyImpulse(CGVector(dx: 0, dy: 55), at: player.position)
             }
             
         }
@@ -168,10 +191,10 @@ public class GameScene: SKScene {
     ///Método responsável por atualização de tela - Executa 60 vezes por segundo (60 FPS)
     override public func update(_ currentTime: TimeInterval) {
         if updateePosition && fowardsBtn {
-            player.physicsBody?.applyImpulse(CGVector(dx: +3, dy: 0), at: player.position)
+            player.physicsBody?.applyImpulse(CGVector(dx: +2, dy: 0), at: player.position)
             
         } else if updateePosition && backwardsBtn {
-            player.physicsBody?.applyImpulse(CGVector(dx: -3, dy: 0), at: player.position)
+            player.physicsBody?.applyImpulse(CGVector(dx: -2, dy: 0), at: player.position)
         }
         
         /// Atualiza a posição da Câmera, dos botões e do texto na cena
@@ -179,26 +202,26 @@ public class GameScene: SKScene {
         controls.btnBackwards.position = CGPoint(x: gameCamera.position.x-self.size.width*0.4, y: self.size.height*0.1)
         controls.btnFowards.position = CGPoint(x: gameCamera.position.x-self.size.width*0.3, y: self.size.height*0.1)
         controls.btnJump.position = CGPoint(x: gameCamera.position.x-self.size.width*0.2, y: self.size.height*0.1)
-        gameText.textLabel.position = CGPoint(x: gameCamera.position.x-self.size.width*0.25, y: self.size.height*0.9)
-        gameText.textLabelLine2.position = CGPoint(x: gameCamera.position.x-self.size.width*0.25, y: self.size.height*0.83)
+        gameText.textLabel.position = CGPoint(x: gameCamera.position.x-self.size.width*0.15, y: self.size.height*0.9)
+        gameText.textLabelLine2.position = CGPoint(x: gameCamera.position.x-self.size.width*0.15, y: self.size.height*0.83)
         
         if !mirrorCrached {
             clonePlayer.position = CGPoint(x: smallWall.position.x + (smallWall.position.x - player.position.x), y: player.position.y)
             clonePlayer.zRotation = -player.zRotation
         }
         
-        if player.intersects(invisibleWall.invisibleWall) {
+        if player.intersects(invisibleWall) {
             
             switch invisibleWallCount {
             case 0:
-                invisibleWall.invisibleWall.removeFromParent()
+                invisibleWall.removeFromParent()
                 changeText(msgTxt1: gameText.textValues["text2"]!, msgTxt2: "", color: .brown, timeWait: nil, completion: nil)
                 invisibleWallCount += 1
 
-                invisibleWall.invisibleWall.position = CGPoint(x: 1000, y:0)
-                addChild(invisibleWall.invisibleWall)
+                invisibleWall.position = CGPoint(x: bigWall.position.x+self.size.width*0.1, y:0)
+                addChild(invisibleWall)
             case 1:
-                invisibleWall.invisibleWall.removeFromParent()
+                invisibleWall.removeFromParent()
 
                 changeText(msgTxt1: gameText.textValues["text3"]!, msgTxt2: "", color: .brown, timeWait: nil, completion: nil)
                 invisibleWallCount += 1
@@ -216,11 +239,11 @@ public class GameScene: SKScene {
         gameText.textLabelLine2.run(actionFadeOut)
         gameText.textLabel.run(actionFadeOut){
             self.gameText.textLabel.text = msgTxt1
-            self.gameText.textLabel.fontSize = 35
+            self.gameText.textLabel.fontSize = 20
             self.gameText.textLabel.fontColor = color
             
             self.gameText.textLabelLine2.text = msgTxt2
-            self.gameText.textLabelLine2.fontSize = 35
+            self.gameText.textLabelLine2.fontSize = 20
             self.gameText.textLabelLine2.fontColor = color
             
             if let time = timeWait {
@@ -275,10 +298,14 @@ public class GameScene: SKScene {
                                            }
                                        }
                                    }
-                                   self.clonePlayer.run(SKAction.fadeAlpha(by: 0.2, duration: 1))
-                                   self.mirror.mirror.removeFromParent()
-                                   self.addChild(self.breakingMirrorSound)
-                                   self.mirrorCrached = true
+                                    self.clonePlayer.run(SKAction.fadeAlpha(by: 0.2, duration: 1))
+                                    self.mirror.removeFromParent()
+                                    self.addChild(self.breakingMirrorSound)
+                                    self.breakingMirrorSound.run(SKAction.changeVolume(to: 0.3, duration: 0))
+                                    self.breakingMirrorSound.run(SKAction.wait(forDuration: 0.5)){
+                                        self.breakingMirrorSound.removeFromParent()
+                                    }
+                                    self.mirrorCrached = true
                                 }
                             }
                         }
@@ -294,14 +321,25 @@ public class GameScene: SKScene {
 //MARK: - Colisão
 extension GameScene: SKPhysicsContactDelegate{
     public func didBegin(_ contact: SKPhysicsContact) {
-        //Verifica o contato
+        //Teem que alterar aqui, tanto o mirror como o invisibleWall
         if contact.bodyB.node?.name == "player" && contact.bodyA.node?.name == "mirror" || contact.bodyA.node?.name == "player" && contact.bodyB.node?.name == "mirror"{
             
+            print("Bateu no Espelho - Position: \(contact.contactPoint)")
+            print("BodyA - : \(contact.bodyA.node?.position)")
+            print("BodyB - : \(contact.bodyB.node?.position)")
             damege(node: player)
             
             if invisibleWallCount == 2 {
                 changeText(msgTxt1: gameText.textValues["text4"]!, msgTxt2: gameText.textValues["text4_2"]!, color: .brown, timeWait: nil, completion: nil)
-                addChild(trueVisionPower.trueVisionPower)
+                
+                addChild(self.trueVisionPower)
+                
+                powerRise.run(SKAction.changeVolume(to: 0.3, duration: 0))
+                addChild(powerRise)
+                powerRise.run(SKAction.wait(forDuration: 3)){
+                    self.powerRise.removeFromParent()
+                }
+                
                 invisibleWallCount = -1
             } else if gotPowerVision  && !beginFrases{
                finalAct()
@@ -312,29 +350,45 @@ extension GameScene: SKPhysicsContactDelegate{
             if !gotPowerVision {
                 let fadeOut = SKAction.fadeOut(withDuration: 1)
                 let fadeIn = SKAction.fadeIn(withDuration: 1)
-                trueVisionPower.trueVisionPower.physicsBody = nil
+                trueVisionPower.physicsBody = nil
                 
-                trueVisionPower.trueVisionPower.run(fadeOut){
-                    self.trueVisionPower.trueVisionPower.removeFromParent()
+                trueVisionPower.run(fadeOut){
+                    self.trueVisionPower.removeFromParent()
                 }
-                background.run(fadeOut)
-                background3.run(fadeOut)
-                background2.run(fadeOut){
-                    
+                
+                background.run(fadeOut){
                     self.background.texture = SKTexture(imageNamed: "Assets/Background_Color")
-                    self.background2.texture = SKTexture(imageNamed: "Assets/Background_Color")
-                    self.background3.texture = SKTexture(imageNamed: "Assets/Background_Color")
                     self.background.run(fadeIn)
+                }
+                background2.run(fadeOut){
+                    self.background2.texture = SKTexture(imageNamed: "Assets/Background_Color")
                     self.background2.run(fadeIn)
+                }
+                background3.run(fadeOut){
+                    self.background3.texture = SKTexture(imageNamed: "Assets/Background_Color")
                     self.background3.run(fadeIn)
-                    
+                }
+                
+                smallWall.run(fadeOut){
                     self.smallWall.texture = SKTexture(imageNamed: "Assets/SmallWall_Color")
-                    self.mediumWall.texture = SKTexture(imageNamed: "Assets/MediumWall_Color")
-                    self.bigWall.texture = SKTexture(imageNamed: "Assets/BigWall_Color")
                     self.smallWall.run(fadeIn)
+                }
+                mediumWall.run(fadeOut){
+                    self.mediumWall.texture = SKTexture(imageNamed: "Assets/MediumWall_Color")
                     self.mediumWall.run(fadeIn)
+                }
+                bigWall.run(fadeOut){
+                    self.bigWall.texture = SKTexture(imageNamed: "Assets/BigWall_Color")
                     self.bigWall.run(fadeIn)
                 }
+                
+                
+                backgroundFade.run(SKAction.changeVolume(to: 0.3, duration: 0))
+                addChild(backgroundFade)
+                backgroundFade.run(SKAction.wait(forDuration: 3)){
+                    self.backgroundFade.removeFromParent()
+                }
+                
                 
                 changeText(msgTxt1: gameText.textValues["text5"]!, msgTxt2: gameText.textValues["text5_2"]!, color: .white, timeWait: 0, completion: nil)
                 

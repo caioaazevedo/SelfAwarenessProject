@@ -38,28 +38,16 @@ public class GameText {
     
     public init(scene: GameScene) {
         ///Configuração e adição do texto na Tela
-        let waitAction = SKAction.wait(forDuration: 2)
-        let fadeIn = SKAction.fadeIn(withDuration: 1)
-        let sequence = SKAction.sequence([waitAction, fadeIn])
-        
         
         self.textLabel.text = self.textValues["text1"]
-        self.textLabel.fontSize = 35
+        self.textLabel.fontSize = 20
         self.textLabel.fontColor = SKColor.brown
-        self.textLabel.position = CGPoint(x: scene.frame.size.width*0.25, y: scene.size.height*0.9)
+        self.textLabel.position = CGPoint(x: scene.frame.size.width*0.35, y: scene.size.height*0.9)
         
-        self.textLabel.run(sequence){
-            scene.addChild(self.textLabel)
-        }
-        
-        self.textLabelLine2.text = self.textValues["text1"]
-        self.textLabelLine2.fontSize = 35
+        self.textLabelLine2.text = self.textValues["text1_2"]
+        self.textLabelLine2.fontSize = 20
         self.textLabelLine2.fontColor = SKColor.brown
-        self.textLabelLine2.position = CGPoint(x: scene.frame.size.width*0.25, y: scene.size.height*0.85)
-        
-        self.textLabelLine2.run(sequence){
-            scene.addChild(self.textLabelLine2)
-        }
+        self.textLabelLine2.position = CGPoint(x: scene.frame.size.width*0.35, y: scene.size.height*0.85)
     }
     
     public init(){}
