@@ -10,8 +10,6 @@ public class Player: Ball {
         self.name = "player"
     }
     
-    public init(){}
-    
     required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }

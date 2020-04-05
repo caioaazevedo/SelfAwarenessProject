@@ -11,8 +11,6 @@ public class Clone: Ball {
         self.alpha = 0
     }
     
-    public init(){}
-    
     required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }

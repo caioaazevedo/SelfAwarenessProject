@@ -1,10 +1,10 @@
 import Foundation
 import SpriteKit
 
-class Background: SKSpriteNode {
+public class GameBackground: SKSpriteNode {
     public init(scene: GameScene, positionX: CGFloat) {
         let sizeNode = CGSize(width: 1187, height: scene.frame.size.height)
-        let texture = SKTexture(imageNamed: "Background_Mono.png")
+        let texture = SKTexture(imageNamed: "Assets/Background_Mono.png")
         super.init(texture: texture, color: UIColor.clear, size: sizeNode)
         /// Anchor Point Zero - significa que o ponto de ancoragem do sprite é o canto Inferior Esquerdo dele
         self.anchorPoint = CGPoint.zero
@@ -14,7 +14,9 @@ class Background: SKSpriteNode {
         self.zPosition = -1
     }
     
-    public init(){}
+    public init(){
+        super.init(texture: nil, color: .clear, size: CGSize.zero)
+    }
     
     required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")

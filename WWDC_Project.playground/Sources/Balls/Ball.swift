@@ -11,7 +11,7 @@ public class Ball: SKSpriteNode {
         let playerHeight = scene.size.height * 0.13011
         let sizeNode = CGSize(width: playerWidth, height: playerHeight)
         
-        let texture = SKTexture(imageNamed: "PlayerBall.png")
+        let texture = SKTexture(imageNamed: "Assets/PlayerBall.png")
         
         super.init(texture: texture, color: .clear, size: sizeNode)
         
@@ -23,7 +23,9 @@ public class Ball: SKSpriteNode {
         self.physicsBody = SKPhysicsBody(circleOfRadius: (playerWidth/2)-3)
     }
     
-    public init(){}
+    public init(){
+        super.init(texture: nil, color: .clear, size: CGSize.zero)
+    }
     
     required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")

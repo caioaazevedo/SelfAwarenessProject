@@ -11,7 +11,7 @@ public class MediumWall: SKSpriteNode {
         let mediumWallHeight = scene.size.height * 0.212890
         
         let sizeNode = CGSize(width: mediumWallWidth, height: mediumWallHeight)
-        let texture = SKTexture(imageNamed: "MediumWall_Mono")
+        let texture = SKTexture(imageNamed: "Assets/MediumWall_Mono")
         
         super.init(texture: texture, color: .clear, size: sizeNode)
         
@@ -22,7 +22,9 @@ public class MediumWall: SKSpriteNode {
         self.physicsBody?.isDynamic = false
     }
     
-    public init(){}
+    public init(){
+        super.init(texture: nil, color: .clear, size: CGSize.zero)
+    }
     
     required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")

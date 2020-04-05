@@ -11,7 +11,7 @@ public class SmallWall: SKSpriteNode {
         let smallWallHeight = scene.size.height * 0.109970
         
         let sizeNode = CGSize(width: smallWallWidth, height: smallWallHeight)
-        let texture = SKTexture(imageNamed: "MediumWall_Mono")
+        let texture = SKTexture(imageNamed: "Assets/SmallWall_Mono")
         
         super.init(texture: texture, color: .clear, size: sizeNode)
         
@@ -22,7 +22,9 @@ public class SmallWall: SKSpriteNode {
         self.physicsBody?.isDynamic = false
     }
     
-    public init(){}
+    public init(){
+        super.init(texture: nil, color: .clear, size: CGSize.zero)
+    }
     
     required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")

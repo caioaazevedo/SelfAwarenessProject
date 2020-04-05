@@ -5,18 +5,17 @@ public class GameScene: SKScene {
     
 //MARK: - Atributos da Cena
     
-    var background = Background()
-    var background2 = Background()
-    var background3 = Background()
-    var player = Player()
-    var clonePlayer = Clone()
+    var background = GameBackground()
+    var background2 = GameBackground()
+    var background3 = GameBackground()
+    var player = Ball()
+    var clonePlayer = Ball()
 
     var bigWall = BigWall()
     var mediumWall = MediumWall()
     var smallWall = SmallWall()
 
     var ground = Ground()
-
     var controls = Control()
 
     var backgroundMusic = SKAudioNode()
@@ -42,7 +41,8 @@ public class GameScene: SKScene {
     var fowardsBtn = false
     var backwardsBtn = false
     
-    public override func didMove(to view: SKView) {
+    public override init(size: CGSize) {
+        super.init(size: size)
         /// Adição da música na Cena em loop infinito
         backgroundMusic = SKAudioNode(fileNamed: "Sounds/Acústico.m4a")
         backgroundMusic.run(SKAction.changeVolume(to: 0.1, duration: 0))
@@ -60,9 +60,9 @@ public class GameScene: SKScene {
         addChild(gameCamera)
 
         /// Adicinando o Background em toda a extensão da cena
-        background = Background(scene: self, positionX: -(self.size.width/2))
-        background2 = Background(scene: self, positionX: background.size.width-(self.size.width/2))
-        background3 = Background(scene: self, positionX: background2.position.x + background2.size.width)
+        background = GameBackground(scene: self, positionX: -(self.size.width/2))
+        background2 = GameBackground(scene: self, positionX: background.size.width-(self.size.width/2))
+        background3 = GameBackground(scene: self, positionX: background2.position.x + background2.size.width)
         addChild(background)
         addChild(background2)
         addChild(background3)
@@ -87,10 +87,15 @@ public class GameScene: SKScene {
 
         /// Adição do Player na cena
         player = Player(scene: self)
+        player.physicsBody!.contactTestBitMask = 0b0001
+        player.name = "player"
         addChild(player)
 
         /// Adição do Clone na cena
-        clonePlayer = Clone(scene: self, smallWall: smallWall)
+        clonePlayer = Ball(scene: self)
+        let point = CGPoint(x: smallWall.position.x + self.size.width*0.2, y: self.position.y*0.5)
+        clonePlayer.position = point
+        clonePlayer.alpha = 0
         addChild(clonePlayer)
 
         controls = Control(scene: self)
@@ -114,16 +119,13 @@ public class GameScene: SKScene {
         self.physicsWorld.gravity = CGVector(dx: 0, dy: -5)
     }
     
-//    public override init(size: CGSize) {
-//        super.init()
-//        self.size = size
-//        
-//        
-//    }
-//    
-//    required init?(coder aDecoder: NSCoder) {
-//        fatalError("init(coder:) has not been implemented")
-//    }
+    required init?(coder aDecoder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
+    public override func didMove(to view: SKView) {
+        
+    }
     
 //MARK: - Movimento
     /// Método responsável por identificar o início do toque do ususário
@@ -166,14 +168,14 @@ public class GameScene: SKScene {
     ///Método responsável por atualização de tela - Executa 60 vezes por segundo (60 FPS)
     override public func update(_ currentTime: TimeInterval) {
         if updateePosition && fowardsBtn {
-            player.physicsBody?.applyImpulse(CGVector(dx: +5, dy: 0), at: player.position)
+            player.physicsBody?.applyImpulse(CGVector(dx: +3, dy: 0), at: player.position)
             
         } else if updateePosition && backwardsBtn {
-            player.physicsBody?.applyImpulse(CGVector(dx: -5, dy: 0), at: player.position)
+            player.physicsBody?.applyImpulse(CGVector(dx: -3, dy: 0), at: player.position)
         }
         
         /// Atualiza a posição da Câmera, dos botões e do texto na cena
-        gameCamera.position.x = player!.position.x + self.size.width * 0.15
+        gameCamera.position.x = player.position.x + self.size.width * 0.15
         controls.btnBackwards.position = CGPoint(x: gameCamera.position.x-self.size.width*0.4, y: self.size.height*0.1)
         controls.btnFowards.position = CGPoint(x: gameCamera.position.x-self.size.width*0.3, y: self.size.height*0.1)
         controls.btnJump.position = CGPoint(x: gameCamera.position.x-self.size.width*0.2, y: self.size.height*0.1)
@@ -198,7 +200,7 @@ public class GameScene: SKScene {
             case 1:
                 invisibleWall.invisibleWall.removeFromParent()
 
-                changeText(msgTxt1: gameText!.textValues["text3"], msgTxt2: "", color: .brown, timeWait: nil, completion: nil)
+                changeText(msgTxt1: gameText.textValues["text3"]!, msgTxt2: "", color: .brown, timeWait: nil, completion: nil)
                 invisibleWallCount += 1
             default:
                 print("nothing")
@@ -245,13 +247,46 @@ public class GameScene: SKScene {
         
         node.run(sequence)
         
-        addChild(damageSound!)
+        addChild(damageSound)
         
         damageSound.run(SKAction.changeVolume(to: 0.3, duration: 0))
         damageSound.run(SKAction.wait(forDuration: 0.5)){
             self.damageSound.removeFromParent()
         }
         
+    }
+    
+    func finalAct(){
+        changeText(msgTxt1: gameText.textValues["text6"]!, msgTxt2: gameText.textValues["text6_2"]!, color: .white, timeWait: 3) {
+            self.changeText(msgTxt1: self.gameText.textValues["text7"]!, msgTxt2: self.gameText.textValues["text7_2"]!, color: .white, timeWait: 3) {
+               self.changeText(msgTxt1: self.gameText.textValues["text8"]!, msgTxt2: self.gameText.textValues["text8_2"]!, color: .white, timeWait: 3) {
+                   self.changeText(msgTxt1: self.gameText.textValues["text9"]!, msgTxt2: self.gameText.textValues["text9_2"]!, color: .white, timeWait: 3) {
+                       self.changeText(msgTxt1: self.gameText.textValues["text10"]!, msgTxt2: self.gameText.textValues["text10_2"]!, color: .white, timeWait: 3) {
+                           self.changeText(msgTxt1: self.gameText.textValues["text11"]!, msgTxt2: self.gameText.textValues["text11_2"]!, color: .white, timeWait: 3) {
+                               self.changeText(msgTxt1: self.gameText.textValues["text12"]!, msgTxt2: self.gameText.textValues["text12_2"]!, color: .white, timeWait: 3){
+                                
+                                   self.player.run(SKAction.fadeOut(withDuration: 1)){
+                                       self.player.texture = SKTexture(imageNamed: "Assets/PlayerBall_Titanium")
+                                       self.player.setScale(1.5)
+                                       self.player.run(SKAction.fadeIn(withDuration: 1))
+                                       self.changeText(msgTxt1: self.gameText.textValues["text13"]!, msgTxt2: self.gameText.textValues["text13_2"]!, color: .white, timeWait: 3){
+                                           self.changeText(msgTxt1: self.gameText.textValues["text14"]!, msgTxt2: self.gameText.textValues["text14_2"]!, color: .white, timeWait: 3){
+                                               
+                                           }
+                                       }
+                                   }
+                                   self.clonePlayer.run(SKAction.fadeAlpha(by: 0.2, duration: 1))
+                                   self.mirror.mirror.removeFromParent()
+                                   self.addChild(self.breakingMirrorSound)
+                                   self.mirrorCrached = true
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        beginFrases = true
     }
     
 }
@@ -262,45 +297,14 @@ extension GameScene: SKPhysicsContactDelegate{
         //Verifica o contato
         if contact.bodyB.node?.name == "player" && contact.bodyA.node?.name == "mirror" || contact.bodyA.node?.name == "player" && contact.bodyB.node?.name == "mirror"{
             
-            damege(node: player!)
+            damege(node: player)
             
             if invisibleWallCount == 2 {
                 changeText(msgTxt1: gameText.textValues["text4"]!, msgTxt2: gameText.textValues["text4_2"]!, color: .brown, timeWait: nil, completion: nil)
                 addChild(trueVisionPower.trueVisionPower)
                 invisibleWallCount = -1
             } else if gotPowerVision  && !beginFrases{
-                
-                changeText(msgTxt1: gameText.textValues["text6"]!, msgTxt2: gameText!.textValues["text6_2"]!, color: .white, timeWait: 3) {
-                    self.changeText(msgTxt1: self.gameText.textValues["text7"]!, msgTxt2: self.gameText.textValues["text7_2"]!, color: .white, timeWait: 3) {
-                        self.changeText(msgTxt1: self.gameText.textValues["text8"]!, msgTxt2: self.gameText.textValues["text8_2"]!, color: .white, timeWait: 3) {
-                            self.changeText(msgTxt1: self.gameText.textValues["text9"]!, msgTxt2: self.gameText.textValues["text9_2"]!, color: .white, timeWait: 3) {
-                                self.changeText(msgTxt1: self.gameText.textValues["text10"]!, msgTxt2: self.gameText.textValues["text10_2"]!, color: .white, timeWait: 3) {
-                                    self.changeText(msgTxt1: self.gameText.textValues["text11"]!, msgTxt2: self.gameText.textValues["text11_2"]!, color: .white, timeWait: 3) {
-                                        self.changeText(msgTxt1: self.gameText.textValues["text12"]!, msgTxt2: self.gameText.textValues["text12_2"]!, color: .white, timeWait: 3){
-                                            self.player!.run(SKAction.fadeOut(withDuration: 1)){
-                                                self.player.texture = SKTexture(imageNamed: "Assets/PlayerBall_Titanium")
-                                                self.player.setScale(1.5)
-                                                self.player.run(SKAction.fadeIn(withDuration: 1))
-                                                self.changeText(msgTxt1: self.gameText.textValues["text13"]!, msgTxt2: self.gameText.textValues["text13_2"]!, color: .white, timeWait: 3){
-                                                    self.changeText(msgTxt1: self.gameText.textValues["text14"]!, msgTxt2: self.gameText.textValues["text14_2"]!, color: .white, timeWait: 3){
-                                                        
-                                                    }
-                                                }
-                                            }
-                                            self.clonePlayer.run(SKAction.fadeAlpha(by: 0.2, duration: 1))
-                                            self.mirror.mirror.removeFromParent()
-                                            self.addChild(self.breakingMirrorSound)
-                                            self.mirrorCrached = true
-                                            
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-                
-                beginFrases = true
+               finalAct()
             }
             
         } else if contact.bodyB.node?.name == "player" && contact.bodyA.node?.name == "trueVisionPower" || contact.bodyA.node?.name == "player" && contact.bodyB.node?.name == "trueVisionPower" {
