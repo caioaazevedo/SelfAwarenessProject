@@ -22,7 +22,7 @@ public class FinalScene: SKScene {
         
         title.text = "So..."
         title.fontSize = 40
-        title.color = .white
+        title.fontColor = .white
         title.alpha = 0.0
         title.position = CGPoint(x: self.size.width*0.5, y: self.size.height*0.75)
         self.addChild(self.title)
@@ -30,18 +30,15 @@ public class FinalScene: SKScene {
         self.titleLine2.text = "How much do you know yourself?"
         self.titleLine2.fontSize = 40
         self.titleLine2.alpha = 0.0
-        self.titleLine2.color = .white
+        self.titleLine2.fontColor = .white
         self.titleLine2.position = CGPoint(x: self.size.width*0.5, y: self.size.height*0.6)
         self.addChild(self.titleLine2)
         
-        title.run(SKAction.fadeIn(withDuration: 1)){
-            self.title.alpha = 1.0
-            self.titleLine2.run(SKAction.fadeIn(withDuration: 1)){
-                self.titleLine2.alpha = 1.0
-            }
-        }
-        
-        
-        
+//        title.run(SKAction.fadeIn(withDuration: 1)){
+//            self.title.alpha = 1.0
+//            self.titleLine2.run(SKAction.fadeIn(withDuration: 1)){
+//                self.titleLine2.alpha = 1.0
+//            }
+//        }
     }
 }
