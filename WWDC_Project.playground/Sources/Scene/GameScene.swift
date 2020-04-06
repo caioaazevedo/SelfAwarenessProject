@@ -31,7 +31,8 @@ public class GameScene: SKScene {
 
     var invisibleWall = SKShapeNode()
     var mirror = SKShapeNode()
-    var trueVisionPower = SKShapeNode()
+    var trueVisionPower = Power()
+    var titaniumPower = Power()
     
     var invisibleWallCount = 0
     
@@ -59,12 +60,10 @@ public class GameScene: SKScene {
         backgroundMusic.run(SKAction.changeVolume(to: 0.1, duration: 0))
         backgroundMusic.autoplayLooped = true
 
-        addChild(backgroundMusic)
-
         powerRise = SKAudioNode(fileNamed: "Sounds/PowerRise.m4a")
         backgroundFade = SKAudioNode(fileNamed: "Sounds/BackgroudRise.m4a")
         damageSound = SKAudioNode(fileNamed: "Sounds/Damage.wav")
-        breakingMirrorSound = SKAudioNode(fileNamed: "Sounds/GlassBroken.mp3")
+        breakingMirrorSound = SKAudioNode(fileNamed: "Sounds/MirrorBreakingSound.mp3")
         transformAudio = SKAudioNode(fileNamed: "Sounds/Transform.m4a")
 
         ///
@@ -129,13 +128,11 @@ public class GameScene: SKScene {
         addChild(gameText.textLabel)
         addChild(gameText.textLabelLine2)
         
+        trueVisionPower = Power(scene: self, bigWall: bigWall)
         
-        self.trueVisionPower = SKShapeNode(circleOfRadius: 25)
-        self.trueVisionPower.position = CGPoint(x: bigWall.position.x + self.size.width*0.6, y: self.size.height*0.4)
-        self.trueVisionPower.fillColor = .blue
-        self.trueVisionPower.name = "trueVisionPower"
-        self.trueVisionPower.physicsBody = SKPhysicsBody(circleOfRadius: trueVisionPower.frame.size.width/2)
-        self.trueVisionPower.physicsBody?.isDynamic = false
+        titaniumPower = Power(scene: self, bigWall: bigWall)
+        titaniumPower.texture = SKTexture(imageNamed: "Assets/TitaniumPower.png")
+        titaniumPower.name = "titaniumPower"
 
         /// Configuração da física do jogo e delimitação da área sujeita a física
         self.physicsWorld.contactDelegate = self
@@ -145,6 +142,8 @@ public class GameScene: SKScene {
         let heightBody = self.size.height*0.85
 
         let sceneRect = CGRect(x: 0, y: posY, width: widthBody, height: heightBody)
+        
+        addChild(backgroundMusic)
 
         /// Seta o physics Body da cena - O edge loop determina um corpo estático, não move e nem colide
         self.physicsBody = SKPhysicsBody(edgeLoopFrom: sceneRect)
@@ -236,11 +235,13 @@ public class GameScene: SKScene {
             
         } else if (player.intersects(clonePlayer) && mirrorCrached) && !intersection{
             intersection = true
-            
-            breakingMirrorSound.run(SKAction.changeVolume(to: 0.3, duration: 0))
+            breakingMirrorSound.run(SKAction.changeVolume(to: 0.5, duration: 0))
             addChild(breakingMirrorSound)
-            breakingMirrorSound.run(SKAction.wait(forDuration: 0.5)){
+            breakingMirrorSound.run(SKAction.wait(forDuration: 1)){
                 self.breakingMirrorSound.removeFromParent()
+            }
+            self.clonePlayer.run(SKAction.fadeOut(withDuration: 1)){
+                self.clonePlayer.removeFromParent()
             }
         }
     }
@@ -285,7 +286,7 @@ public class GameScene: SKScene {
         
         addChild(damageSound)
         
-        damageSound.run(SKAction.changeVolume(to: 0.3, duration: 0))
+        damageSound.run(SKAction.changeVolume(to: 0.5, duration: 0))
         damageSound.run(SKAction.wait(forDuration: 0.5)){
             self.damageSound.removeFromParent()
         }
@@ -300,7 +301,14 @@ public class GameScene: SKScene {
                        self.changeText(msgTxt1: self.gameText.textValues["text10"]!, msgTxt2: self.gameText.textValues["text10_2"]!, color: .white, timeWait: 3) {
                            self.changeText(msgTxt1: self.gameText.textValues["text11"]!, msgTxt2: self.gameText.textValues["text11_2"]!, color: .white, timeWait: 3) {
                                self.changeText(msgTxt1: self.gameText.textValues["text12"]!, msgTxt2: self.gameText.textValues["text12_2"]!, color: .white, timeWait: 3){
-                                self.playerTransformation()
+                                
+                                    self.addChild(self.titaniumPower)
+                                    
+                                    self.powerRise.run(SKAction.changeVolume(to: 0.3, duration: 0))
+                                    self.addChild(self.powerRise)
+                                    self.powerRise.run(SKAction.wait(forDuration: 3)){
+                                        self.powerRise.removeFromParent()
+                                    }
                                 }
                             }
                         }
@@ -312,12 +320,15 @@ public class GameScene: SKScene {
     }
     
     func playerTransformation(){
+        self.mirror.removeFromParent()
+        self.mirrorCrached = true
         transformAudio.run(SKAction.changeVolume(to: 0.3, duration: 0))
         addChild(self.transformAudio)
-        transformAudio.run(SKAction.wait(forDuration: 3)){
+        transformAudio.run(SKAction.wait(forDuration: 10)){
             self.transformAudio.removeFromParent()
         }
         let texture = SKTexture(imageNamed: "Assets/PlayerBall_Titanium")
+        self.player.run(SKAction.fadeIn(withDuration: 1))
         self.player.run(SKAction.setTexture(texture)){
                self.changeText(msgTxt1: self.gameText.textValues["text13"]!, msgTxt2: self.gameText.textValues["text13_2"]!, color: .white, timeWait: 3){
                    self.changeText(msgTxt1: self.gameText.textValues["text14"]!, msgTxt2: self.gameText.textValues["text14_2"]!, color: .white, timeWait: 3, completion: nil)
@@ -325,8 +336,48 @@ public class GameScene: SKScene {
         }
         self.player.run(SKAction.scale(by: 1.5, duration: 1))
         self.clonePlayer.run(SKAction.fadeAlpha(by: 0.2, duration: 1))
-        self.mirror.removeFromParent()
-        self.mirrorCrached = true
+    }
+    
+    func changeScenario() {
+        let fadeOut = SKAction.fadeOut(withDuration: 1)
+        let fadeIn = SKAction.fadeIn(withDuration: 1)
+        trueVisionPower.physicsBody = nil
+        
+        trueVisionPower.run(fadeOut){
+            self.trueVisionPower.removeFromParent()
+        }
+        
+        background.run(fadeOut){
+            self.background.texture = SKTexture(imageNamed: "Assets/Background_Color")
+            self.background.run(fadeIn)
+        }
+        background2.run(fadeOut){
+            self.background2.texture = SKTexture(imageNamed: "Assets/Background_Color")
+            self.background2.run(fadeIn)
+        }
+        background3.run(fadeOut){
+            self.background3.texture = SKTexture(imageNamed: "Assets/Background_Color")
+            self.background3.run(fadeIn)
+        }
+        
+        smallWall.run(fadeOut){
+            self.smallWall.texture = SKTexture(imageNamed: "Assets/SmallWall_Color")
+            self.smallWall.run(fadeIn)
+        }
+        mediumWall.run(fadeOut){
+            self.mediumWall.texture = SKTexture(imageNamed: "Assets/MediumWall_Color")
+            self.mediumWall.run(fadeIn)
+        }
+        bigWall.run(fadeOut){
+            self.bigWall.texture = SKTexture(imageNamed: "Assets/BigWall_Color")
+            self.bigWall.run(fadeIn)
+        }
+        
+        backgroundFade.run(SKAction.changeVolume(to: 0.3, duration: 0))
+        addChild(backgroundFade)
+        backgroundFade.run(SKAction.wait(forDuration: 4)){
+            self.backgroundFade.removeFromParent()
+        }
     }
     
 }
@@ -337,9 +388,6 @@ extension GameScene: SKPhysicsContactDelegate{
         //Teem que alterar aqui, tanto o mirror como o invisibleWall
         if contact.bodyB.node?.name == "player" && contact.bodyA.node?.name == "mirror" || contact.bodyA.node?.name == "player" && contact.bodyB.node?.name == "mirror"{
             
-            print("Bateu no Espelho - Position: \(contact.contactPoint)")
-            print("BodyA - : \(contact.bodyA.node?.position)")
-            print("BodyB - : \(contact.bodyB.node?.position)")
             damege(node: player)
             
             if invisibleWallCount == 2 {
@@ -361,57 +409,23 @@ extension GameScene: SKPhysicsContactDelegate{
         } else if contact.bodyB.node?.name == "player" && contact.bodyA.node?.name == "trueVisionPower" || contact.bodyA.node?.name == "player" && contact.bodyB.node?.name == "trueVisionPower" {
             
             if !gotPowerVision {
-                let fadeOut = SKAction.fadeOut(withDuration: 1)
-                let fadeIn = SKAction.fadeIn(withDuration: 1)
-                trueVisionPower.physicsBody = nil
                 
-                trueVisionPower.run(fadeOut){
-                    self.trueVisionPower.removeFromParent()
-                }
-                
-                background.run(fadeOut){
-                    self.background.texture = SKTexture(imageNamed: "Assets/Background_Color")
-                    self.background.run(fadeIn)
-                }
-                background2.run(fadeOut){
-                    self.background2.texture = SKTexture(imageNamed: "Assets/Background_Color")
-                    self.background2.run(fadeIn)
-                }
-                background3.run(fadeOut){
-                    self.background3.texture = SKTexture(imageNamed: "Assets/Background_Color")
-                    self.background3.run(fadeIn)
-                }
-                
-                smallWall.run(fadeOut){
-                    self.smallWall.texture = SKTexture(imageNamed: "Assets/SmallWall_Color")
-                    self.smallWall.run(fadeIn)
-                }
-                mediumWall.run(fadeOut){
-                    self.mediumWall.texture = SKTexture(imageNamed: "Assets/MediumWall_Color")
-                    self.mediumWall.run(fadeIn)
-                }
-                bigWall.run(fadeOut){
-                    self.bigWall.texture = SKTexture(imageNamed: "Assets/BigWall_Color")
-                    self.bigWall.run(fadeIn)
-                }
-                
-                
-                backgroundFade.run(SKAction.changeVolume(to: 0.3, duration: 0))
-                addChild(backgroundFade)
-                backgroundFade.run(SKAction.wait(forDuration: 3)){
-                    self.backgroundFade.removeFromParent()
-                }
-                
+                changeScenario()
                 
                 changeText(msgTxt1: gameText.textValues["text5"]!, msgTxt2: gameText.textValues["text5_2"]!, color: .white, timeWait: 0, completion: nil)
                 
                 self.addChild(self.clonePlayer)
-                clonePlayer.run(fadeIn){
+                clonePlayer.run(SKAction.fadeIn(withDuration: 1)){
                     self.clonePlayer.alpha = 1.0
                 }
                 
                 gotPowerVision = true
             }
+        } else if contact.bodyB.node?.name == "player" && contact.bodyA.node?.name == "titaniumPower" || contact.bodyA.node?.name == "player" && contact.bodyB.node?.name == "titaniumPower" {
+            titaniumPower.run(SKAction.fadeOut(withDuration: 1)){
+                self.titaniumPower.removeFromParent()
+            }
+            playerTransformation()
         }
             print("a: \(contact.bodyA.node?.name ?? "nada"), B: \(contact.bodyB.node?.name ?? "nada")")
             
