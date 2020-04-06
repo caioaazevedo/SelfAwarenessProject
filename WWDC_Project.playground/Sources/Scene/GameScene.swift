@@ -23,6 +23,7 @@ public class GameScene: SKScene {
     var breakingMirrorSound = SKAudioNode()
     var powerRise = SKAudioNode()
     var backgroundFade = SKAudioNode()
+    var transformAudio = SKAudioNode()
 
     var gameText = GameText()
 
@@ -42,6 +43,7 @@ public class GameScene: SKScene {
     var updateePosition = false
     var fowardsBtn = false
     var backwardsBtn = false
+    var intersection = false
     
     public override init(size: CGSize) {
         super.init(size: size)
@@ -63,6 +65,7 @@ public class GameScene: SKScene {
         backgroundFade = SKAudioNode(fileNamed: "Sounds/BackgroudRise.m4a")
         damageSound = SKAudioNode(fileNamed: "Sounds/Damage.wav")
         breakingMirrorSound = SKAudioNode(fileNamed: "Sounds/GlassBroken.mp3")
+        transformAudio = SKAudioNode(fileNamed: "Sounds/Transform.m4a")
 
         ///
         gameCamera = SKCameraNode()
@@ -89,8 +92,7 @@ public class GameScene: SKScene {
         addChild(smallWall)
 
         /// Adição das Paredes Invisíveis para mudaça de texto da Label
-        let posX = self.size.width
-        invisibleWall = SKShapeNode(rect: CGRect(x: posX, y: 0, width: 0, height: self.size.height))
+        invisibleWall = SKShapeNode(rect: CGRect(x: self.size.width, y: 0, width: 0, height: self.size.height))
         invisibleWall.alpha = 0.0
         invisibleWall.name = "invisibleWall"
         invisibleWall.fillColor = .blue
@@ -103,7 +105,7 @@ public class GameScene: SKScene {
         mirror.physicsBody = SKPhysicsBody(edgeLoopFrom: mirror.frame)
         mirror.physicsBody?.isDynamic = false
         mirror.physicsBody?.restitution = 0.8
-        mirror.alpha = 1.0
+        mirror.alpha = 0.0
         mirror.name = "mirror"
         mirror.fillColor = .blue
         mirror.physicsBody?.collisionBitMask = 0b0001
@@ -120,7 +122,6 @@ public class GameScene: SKScene {
         let point = CGPoint(x: smallWall.position.x + self.size.width*0.2, y: player.position.y)
         clonePlayer.position = point
         clonePlayer.alpha = 0
-        addChild(clonePlayer)
 
         controls = Control(scene: self)
 
@@ -206,6 +207,10 @@ public class GameScene: SKScene {
         gameText.textLabelLine2.position = CGPoint(x: gameCamera.position.x-self.size.width*0.15, y: self.size.height*0.83)
         
         if !mirrorCrached {
+            clonePlayer.physicsBody = nil
+        }
+            
+        if gotPowerVision {
             clonePlayer.position = CGPoint(x: smallWall.position.x + (smallWall.position.x - player.position.x), y: player.position.y)
             clonePlayer.zRotation = -player.zRotation
         }
@@ -218,7 +223,7 @@ public class GameScene: SKScene {
                 changeText(msgTxt1: gameText.textValues["text2"]!, msgTxt2: "", color: .brown, timeWait: nil, completion: nil)
                 invisibleWallCount += 1
 
-                invisibleWall.position = CGPoint(x: bigWall.position.x+self.size.width*0.1, y:0)
+                invisibleWall.position = CGPoint(x: bigWall.position.x - (self.size.width*0.9), y:0)
                 addChild(invisibleWall)
             case 1:
                 invisibleWall.removeFromParent()
@@ -229,6 +234,14 @@ public class GameScene: SKScene {
                 print("nothing")
             }
             
+        } else if (player.intersects(clonePlayer) && mirrorCrached) && !intersection{
+            intersection = true
+            
+            breakingMirrorSound.run(SKAction.changeVolume(to: 0.3, duration: 0))
+            addChild(breakingMirrorSound)
+            breakingMirrorSound.run(SKAction.wait(forDuration: 0.5)){
+                self.breakingMirrorSound.removeFromParent()
+            }
         }
     }
     
@@ -287,25 +300,7 @@ public class GameScene: SKScene {
                        self.changeText(msgTxt1: self.gameText.textValues["text10"]!, msgTxt2: self.gameText.textValues["text10_2"]!, color: .white, timeWait: 3) {
                            self.changeText(msgTxt1: self.gameText.textValues["text11"]!, msgTxt2: self.gameText.textValues["text11_2"]!, color: .white, timeWait: 3) {
                                self.changeText(msgTxt1: self.gameText.textValues["text12"]!, msgTxt2: self.gameText.textValues["text12_2"]!, color: .white, timeWait: 3){
-                                
-                                   self.player.run(SKAction.fadeOut(withDuration: 1)){
-                                       self.player.texture = SKTexture(imageNamed: "Assets/PlayerBall_Titanium")
-                                       self.player.setScale(1.5)
-                                       self.player.run(SKAction.fadeIn(withDuration: 1))
-                                       self.changeText(msgTxt1: self.gameText.textValues["text13"]!, msgTxt2: self.gameText.textValues["text13_2"]!, color: .white, timeWait: 3){
-                                           self.changeText(msgTxt1: self.gameText.textValues["text14"]!, msgTxt2: self.gameText.textValues["text14_2"]!, color: .white, timeWait: 3){
-                                               
-                                           }
-                                       }
-                                   }
-                                    self.clonePlayer.run(SKAction.fadeAlpha(by: 0.2, duration: 1))
-                                    self.mirror.removeFromParent()
-                                    self.addChild(self.breakingMirrorSound)
-                                    self.breakingMirrorSound.run(SKAction.changeVolume(to: 0.3, duration: 0))
-                                    self.breakingMirrorSound.run(SKAction.wait(forDuration: 0.5)){
-                                        self.breakingMirrorSound.removeFromParent()
-                                    }
-                                    self.mirrorCrached = true
+                                self.playerTransformation()
                                 }
                             }
                         }
@@ -314,6 +309,24 @@ public class GameScene: SKScene {
             }
         }
         beginFrases = true
+    }
+    
+    func playerTransformation(){
+        transformAudio.run(SKAction.changeVolume(to: 0.3, duration: 0))
+        addChild(self.transformAudio)
+        transformAudio.run(SKAction.wait(forDuration: 3)){
+            self.transformAudio.removeFromParent()
+        }
+        let texture = SKTexture(imageNamed: "Assets/PlayerBall_Titanium")
+        self.player.run(SKAction.setTexture(texture)){
+               self.changeText(msgTxt1: self.gameText.textValues["text13"]!, msgTxt2: self.gameText.textValues["text13_2"]!, color: .white, timeWait: 3){
+                   self.changeText(msgTxt1: self.gameText.textValues["text14"]!, msgTxt2: self.gameText.textValues["text14_2"]!, color: .white, timeWait: 3, completion: nil)
+            }
+        }
+        self.player.run(SKAction.scale(by: 1.5, duration: 1))
+        self.clonePlayer.run(SKAction.fadeAlpha(by: 0.2, duration: 1))
+        self.mirror.removeFromParent()
+        self.mirrorCrached = true
     }
     
 }
@@ -392,6 +405,7 @@ extension GameScene: SKPhysicsContactDelegate{
                 
                 changeText(msgTxt1: gameText.textValues["text5"]!, msgTxt2: gameText.textValues["text5_2"]!, color: .white, timeWait: 0, completion: nil)
                 
+                self.addChild(self.clonePlayer)
                 clonePlayer.run(fadeIn){
                     self.clonePlayer.alpha = 1.0
                 }

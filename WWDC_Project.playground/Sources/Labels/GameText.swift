@@ -7,24 +7,24 @@ public class GameText {
     public var textLabelLine2 = SKLabelNode(fontNamed: "Geneva")
     
     var textValues = ["text1": "Sometimes in life you have obstacles",
-                      "text1_2": "that you need to go through",
-                      "text2": "Some are more difficult than others",
+                      "text1_2": "that you need to overcome",
+                      "text2": "Some are harder than others",
                       "text2_2": "",
                       "text3": "But sometimes...",
                       "text3_2": "",
-                      "text4": "You just can't get through",
+                      "text4": "You just can't get through them",
                       "text4_2": "But why?",
                       "text5": "TRUE VISION",
                       "text5_2": "Allows you to see what you couldn't",
                       "text6": "This is what really happens",
                       "text6_2": "",
-                      "text7": "The most difficult obstacles to pass",
+                      "text7": "The most difficult obstacle to cross",
                       "text7_2": "is yourself",
-                      "text8": "You in the same time that not allowing",
-                      "text8_2": "yourself to pass get hurt by it",
-                      "text9": "You are the victim and the aggressor",
+                      "text8": "While you block your own progress",
+                      "text8_2": "you also get hurt because of it",
+                      "text9": "You are both the victim and the aggressor",
                       "text9_2": "",
-                      "text10": "Now that you know that you are ",
+                      "text10": "Now that you know you are",
                       "text10_2": "your own enemy",
                       "text11": "What if you were able to change that?",
                       "text11_2": "",
@@ -32,9 +32,9 @@ public class GameText {
                       "text12_2": "",
                       "text13": "SELF AWARENESS",
                       "text13_2": "Allows you to understand who you really are",
-                      "text14": "And by that you shield yourself",
+                      "text14": "And with that you shield yourself",
                       "text14_2": "Now that enemy doesn't affect you anymore",
-                      "text15": "How much do you know yourself?"]
+                      "text15": "So... How much do you know yourself?"]
     
     public init(scene: GameScene) {
         ///Configuração e adição do texto na Tela
