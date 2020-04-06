@@ -39,6 +39,7 @@ public class GameScene: SKScene {
     /// Flags
     var cloneCreated = false
     var gotPowerVision = false
+    var gotPowerTitanium = false
     var mirrorCrached = false
     var beginFrases = false
     var updateePosition = false
@@ -139,7 +140,7 @@ public class GameScene: SKScene {
 
         let posY = self.size.height*0.35
         let widthBody = self.size.width*4
-        let heightBody = self.size.height*0.85
+        let heightBody = self.size.height*0.75
 
         let sceneRect = CGRect(x: 0, y: posY, width: widthBody, height: heightBody)
         
@@ -199,9 +200,9 @@ public class GameScene: SKScene {
         
         /// Atualiza a posição da Câmera, dos botões e do texto na cena
         gameCamera.position.x = player.position.x + self.size.width * 0.15
-        controls.btnBackwards.position = CGPoint(x: gameCamera.position.x-self.size.width*0.4, y: self.size.height*0.1)
-        controls.btnFowards.position = CGPoint(x: gameCamera.position.x-self.size.width*0.3, y: self.size.height*0.1)
-        controls.btnJump.position = CGPoint(x: gameCamera.position.x-self.size.width*0.2, y: self.size.height*0.1)
+        controls.btnBackwards.position = CGPoint(x: gameCamera.position.x+self.size.width*0.2, y: self.size.height*0.1)
+        controls.btnFowards.position = CGPoint(x: gameCamera.position.x+self.size.width*0.3, y: self.size.height*0.1)
+        controls.btnJump.position = CGPoint(x: gameCamera.position.x+self.size.width*0.4, y: self.size.height*0.1)
         gameText.textLabel.position = CGPoint(x: gameCamera.position.x-self.size.width*0.15, y: self.size.height*0.9)
         gameText.textLabelLine2.position = CGPoint(x: gameCamera.position.x-self.size.width*0.15, y: self.size.height*0.83)
         
@@ -322,13 +323,14 @@ public class GameScene: SKScene {
     func playerTransformation(){
         self.mirror.removeFromParent()
         self.mirrorCrached = true
+        
         transformAudio.run(SKAction.changeVolume(to: 0.3, duration: 0))
         addChild(self.transformAudio)
-        transformAudio.run(SKAction.wait(forDuration: 10)){
+        transformAudio.run(SKAction.wait(forDuration: 9)){
             self.transformAudio.removeFromParent()
         }
+        
         let texture = SKTexture(imageNamed: "Assets/PlayerBall_Titanium")
-        self.player.run(SKAction.fadeIn(withDuration: 1))
         self.player.run(SKAction.setTexture(texture)){
                self.changeText(msgTxt1: self.gameText.textValues["text13"]!, msgTxt2: self.gameText.textValues["text13_2"]!, color: .white, timeWait: 3){
                    self.changeText(msgTxt1: self.gameText.textValues["text14"]!, msgTxt2: self.gameText.textValues["text14_2"]!, color: .white, timeWait: 3, completion: nil)
@@ -336,6 +338,7 @@ public class GameScene: SKScene {
         }
         self.player.run(SKAction.scale(by: 1.5, duration: 1))
         self.clonePlayer.run(SKAction.fadeAlpha(by: 0.2, duration: 1))
+        
     }
     
     func changeScenario() {
@@ -422,10 +425,16 @@ extension GameScene: SKPhysicsContactDelegate{
                 gotPowerVision = true
             }
         } else if contact.bodyB.node?.name == "player" && contact.bodyA.node?.name == "titaniumPower" || contact.bodyA.node?.name == "player" && contact.bodyB.node?.name == "titaniumPower" {
-            titaniumPower.run(SKAction.fadeOut(withDuration: 1)){
-                self.titaniumPower.removeFromParent()
+            
+            if !gotPowerTitanium{
+                titaniumPower.physicsBody = nil
+                gotPowerVision = true
+                
+                titaniumPower.run(SKAction.fadeOut(withDuration: 1)){
+                    self.titaniumPower.removeFromParent()
+                }
+                playerTransformation()
             }
-            playerTransformation()
         }
             print("a: \(contact.bodyA.node?.name ?? "nada"), B: \(contact.bodyB.node?.name ?? "nada")")
             
