@@ -234,6 +234,13 @@ public class GameScene: SKScene {
                 print("nothing")
             }
             
+            if gotPowerTitanium {
+                let finalScene = FinalScene(size: self.size)
+                self.scene?.run(SKAction.fadeOut(withDuration: 1)){
+                    self.view?.presentScene(finalScene)
+                }
+            }
+            
         } else if (player.intersects(clonePlayer) && mirrorCrached) && !intersection{
             intersection = true
             breakingMirrorSound.run(SKAction.changeVolume(to: 0.5, duration: 0))
@@ -323,6 +330,10 @@ public class GameScene: SKScene {
     func playerTransformation(){
         self.mirror.removeFromParent()
         self.mirrorCrached = true
+        
+        invisibleWall.position = CGPoint(x: self.smallWall.position.x, y: self.size.height*0.4)
+        invisibleWall.fillColor = .blue
+        addChild(invisibleWall)
         
         transformAudio.run(SKAction.changeVolume(to: 0.3, duration: 0))
         addChild(self.transformAudio)
@@ -428,7 +439,7 @@ extension GameScene: SKPhysicsContactDelegate{
             
             if !gotPowerTitanium{
                 titaniumPower.physicsBody = nil
-                gotPowerVision = true
+                gotPowerTitanium = true
                 
                 titaniumPower.run(SKAction.fadeOut(withDuration: 1)){
                     self.titaniumPower.removeFromParent()
