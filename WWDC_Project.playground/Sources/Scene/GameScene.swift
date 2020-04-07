@@ -248,6 +248,7 @@ public class GameScene: SKScene {
             breakingMirrorSound.run(SKAction.wait(forDuration: 1)){
                 self.breakingMirrorSound.removeFromParent()
             }
+            addChild(explosion())
             self.clonePlayer.run(SKAction.fadeOut(withDuration: 1)){
                 self.clonePlayer.removeFromParent()
             }
@@ -392,6 +393,25 @@ public class GameScene: SKScene {
         backgroundFade.run(SKAction.wait(forDuration: 4)){
             self.backgroundFade.removeFromParent()
         }
+    }
+    
+    func explosion() -> SKEmitterNode { let emitter = SKEmitterNode()
+        let particleTexture = SKTexture(imageNamed: "Assets/BallParticle")
+        emitter.position = clonePlayer.position
+        emitter.particleTexture = particleTexture
+        emitter.particleSize = CGSize(width: 5, height: 5)
+        emitter.particleBirthRate = 500
+        emitter.numParticlesToEmit = 400
+        emitter.particleLifetime = 1.0
+        emitter.emissionAngle = CGFloat.pi/2
+        emitter.emissionAngleRange = CGFloat.pi*2
+        emitter.particleSpeed = 700
+        emitter.particleSpeedRange = 500
+        emitter.particleBlendMode = SKBlendMode.add
+        emitter.run(SKAction.wait(forDuration:0.5)){
+            emitter.removeFromParent()
+        }
+      return emitter
     }
     
 }
