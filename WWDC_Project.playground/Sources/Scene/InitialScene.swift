@@ -10,6 +10,12 @@ public class InitialScene: SKScene {
 
     public override init(size: CGSize) {
         super.init(size: size)
+        
+        addChild(backgrooundScene)
+        addChild(title)
+        addChild(titleLine2)
+        addChild(titleLine3)
+        addChild(starButton)
     }
 
     required init?(coder aDecoder: NSCoder) {
@@ -20,35 +26,35 @@ public class InitialScene: SKScene {
         backgrooundScene.size = self.size
         backgrooundScene.position = CGPoint(x: self.size.width*0.5, y: self.size.height*0.5)
         backgrooundScene.zPosition = -1
-        addChild(backgrooundScene)
+        
         
         title.text = "This is a Game"
         title.fontSize = 30
         title.fontColor = .brown
         title.zPosition = 10
-        title.position = CGPoint(x: self.size.width*0.5, y: self.size.height*0.85)
-        addChild(title)
+        title.position = CGPoint(x: self.size.width*0.5, y: self.size.height*0.83)
+        
 
         titleLine2.text = "About"
         titleLine2.fontSize = 30
         titleLine2.fontColor = .brown
         titleLine2.zPosition = 10
         titleLine2.position = CGPoint(x: self.size.width*0.5, y: self.size.height*0.7)
-        addChild(titleLine2)
+        
 
         titleLine3.text = "You"
         titleLine3.fontSize = 50
         titleLine3.fontColor = .brown
         titleLine2.zPosition = 10
-        titleLine3.position = CGPoint(x: self.size.width*0.5, y: self.size.height*0.5)
-        addChild(titleLine3)
+        titleLine3.position = CGPoint(x: self.size.width*0.5, y: self.size.height*0.55)
+        
         
         starButton.size = CGSize(width: self.size.width*0.278184, height: self.size.height*0.087890)
         starButton.position = CGPoint(x: self.size.width*0.5, y: self.size.height*0.1)
         starButton.zPosition = 10
         starButton.alpha = 0.0
         starButton.name = "start"
-        addChild(starButton)
+        
        
         starButton.run(SKAction.fadeIn(withDuration: 1)){
             self.starButton.alpha = 1.0

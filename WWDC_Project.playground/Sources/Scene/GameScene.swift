@@ -33,6 +33,7 @@ public class GameScene: SKScene {
     var mirror = SKShapeNode()
     var trueVisionPower = Power()
     var titaniumPower = Power()
+    var cloneParticle = SKEmitterNode()
     
     var invisibleWallCount = 0
     
@@ -213,6 +214,7 @@ public class GameScene: SKScene {
         if gotPowerVision {
             clonePlayer.position = CGPoint(x: smallWall.position.x + (smallWall.position.x - player.position.x), y: player.position.y)
             clonePlayer.zRotation = -player.zRotation
+            cloneParticle.position = clonePlayer.position
         }
         
         if player.intersects(invisibleWall) {
@@ -248,7 +250,8 @@ public class GameScene: SKScene {
             breakingMirrorSound.run(SKAction.wait(forDuration: 1)){
                 self.breakingMirrorSound.removeFromParent()
             }
-            addChild(explosion())
+            let texture = SKTexture(imageNamed: "CloneParticle.png")
+            addChild(explosion(emitter: self.cloneParticle, particleTexture: texture))
             self.clonePlayer.run(SKAction.fadeOut(withDuration: 1)){
                 self.clonePlayer.removeFromParent()
             }
@@ -395,20 +398,18 @@ public class GameScene: SKScene {
         }
     }
     
-    func explosion() -> SKEmitterNode { let emitter = SKEmitterNode()
-        let particleTexture = SKTexture(imageNamed: "Assets/BallParticle")
-        emitter.position = clonePlayer.position
+    func explosion(emitter: SKEmitterNode, particleTexture: SKTexture) -> SKEmitterNode {
         emitter.particleTexture = particleTexture
         emitter.particleSize = CGSize(width: 5, height: 5)
-        emitter.particleBirthRate = 500
+        emitter.particleBirthRate = 300
         emitter.numParticlesToEmit = 400
         emitter.particleLifetime = 1.0
         emitter.emissionAngle = CGFloat.pi/2
         emitter.emissionAngleRange = CGFloat.pi*2
-        emitter.particleSpeed = 700
+        emitter.particleSpeed = 1000
         emitter.particleSpeedRange = 500
         emitter.particleBlendMode = SKBlendMode.add
-        emitter.run(SKAction.wait(forDuration:0.5)){
+        emitter.run(SKAction.wait(forDuration:1)){
             emitter.removeFromParent()
         }
       return emitter
@@ -427,13 +428,20 @@ extension GameScene: SKPhysicsContactDelegate{
             if invisibleWallCount == 2 {
                 changeText(msgTxt1: gameText.textValues["text4"]!, msgTxt2: gameText.textValues["text4_2"]!, color: .brown, timeWait: nil, completion: nil)
                 
-                addChild(self.trueVisionPower)
-                
-                powerRise.run(SKAction.changeVolume(to: 0.3, duration: 0))
-                addChild(powerRise)
-                powerRise.run(SKAction.wait(forDuration: 3)){
-                    self.powerRise.removeFromParent()
+                self.run(SKAction.wait(forDuration: 10)){
+                    self.addChild(self.trueVisionPower)
+                    self.trueVisionPower.alpha = 0.0
+                    self.trueVisionPower.run(SKAction.fadeIn(withDuration: 1)){
+                        self.trueVisionPower.alpha = 1.0
+                    }
+                    self.powerRise.run(SKAction.changeVolume(to: 0.3, duration: 0))
+                    self.addChild(self.powerRise)
+                    self.powerRise.run(SKAction.wait(forDuration: 3)){
+                        self.powerRise.removeFromParent()
+                    }
                 }
+                
+                
                 
                 invisibleWallCount = -1
             } else if gotPowerVision  && !beginFrases{
